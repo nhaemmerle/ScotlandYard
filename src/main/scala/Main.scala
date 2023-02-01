@@ -32,6 +32,68 @@ object Main {
       }
     }
     mrX.setBlackTickets(detectives.length)
+
+    // game loop
+    var round = 1
+    while (true) {
+      // Move MrX position
+      var validMoves = List[Int]()
+      validMoves = taxiMap.get(mrX.currentLocation) match
+        case Some(l) => l
+        case None => List()
+      validMoves = validMoves ++ (busMap.get(mrX.currentLocation) match
+        case Some(l) => l
+        case None => List())
+      validMoves = validMoves ++ (undergroundMap.get(mrX.currentLocation) match
+        case Some(l) => l
+        case None => List())
+      validMoves = validMoves ++ (blackMap.get(mrX.currentLocation) match
+        case Some(l) => l
+        case None => List())
+      // TODO : check if someone is currently at a valid moves position
+      println(s"${mrX.name}, you are currently at location ${mrX.currentLocation}. You can move to: ${validMoves.mkString(", ")}")
+      print("Enter the number of the location you want to move to: ")
+      val move = scala.io.StdIn.readInt()
+      if (validMoves.contains(move)) {
+        mrX.currentLocation = move
+        println(s"${mrX.name} has moved to location ${mrX.currentLocation}")
+      } else {
+        // TODO try again tut noch nicht
+        println("Invalid move. Please try again.")
+      }
+      // Move Player positions
+      for (detective <- detectives) {
+        // check if game is over
+        if detective.currentLocation == mrX.currentLocation then {
+          println("The detectives win")
+        } else if round >= 24 then {
+          println("Mr. X wins!")
+        }
+        validMoves = List[Int]()
+        validMoves = taxiMap.get(detective.currentLocation) match
+          case Some(l) => l
+          case None => List()
+        validMoves = validMoves ++ (busMap.get(detective.currentLocation) match
+          case Some(l) => l
+          case None => List())
+        validMoves = validMoves ++ (undergroundMap.get(detective.currentLocation) match
+          case Some(l) => l
+          case None => List())
+        // TODO : check if someone is currently at a valid moves position
+        println(s"${detective.name}, you are currently at location ${detective.currentLocation}. You can move to: ${validMoves.mkString(", ")}")
+        print("Enter the number of the location you want to move to: ")
+        val move = scala.io.StdIn.readInt()
+        if (validMoves.contains(move)) {
+          detective.currentLocation = move
+          println(s"${detective.name} has moved to location ${detective.currentLocation}")
+        } else {
+          // TODO try again tut noch nicht
+          println("Invalid move. Please try again.")
+        }
+      }
+      println(s"Round ${round} is finished")
+      round += 1
+    }
   }
 
   private def readDetective(numDetectives: Int, nextPosition: Int): Detective = {
@@ -308,15 +370,15 @@ object Main {
     190 -> List(176, 180, 191)
   )
   val undergroundMap: Map[Int, List[Int]] = Map(
-    1   -> List(46),
-    46  -> List(1, 13, 74, 79),
-    13  -> List(46, 67, 89),
-    67  -> List(13, 79, 111, 89),
-    89  -> List(13, 67, 140, 128),
-    74  -> List(46),
-    79  -> List(46, 67, 93, 111),
+    1 -> List(46),
+    46 -> List(1, 13, 74, 79),
+    13 -> List(46, 67, 89),
+    67 -> List(13, 79, 111, 89),
+    89 -> List(13, 67, 140, 128),
+    74 -> List(46),
+    79 -> List(46, 67, 93, 111),
     111 -> List(67, 79, 153, 163),
-    93  -> List(79),
+    93 -> List(79),
     140 -> List(89, 153, 128),
     128 -> List(89, 185, 140),
     153 -> List(111, 140, 163, 185),
