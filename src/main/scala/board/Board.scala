@@ -1,3 +1,8 @@
+package board
+
+/**
+ * This object represents the game board. It contains four adjacency lists, representing the four different means of transport.
+ */
 object Board {
   val taxiMap: Map[Int, List[Int]] = Map(
     0 -> List(),
