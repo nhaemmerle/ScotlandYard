@@ -1,4 +1,4 @@
-import board.MapType.{BLACK, BUS, TAXI, UNDERGROUND}
+import board.MapType.*
 import board.{Board, MapType}
 
 import scala.io.StdIn.readLine
@@ -49,7 +49,7 @@ object Main {
       TAXI -> Board.testTaxiMap,
       BUS -> Board.busMap,
       UNDERGROUND -> Board.undergroundMap,
-      BLACK -> Board.blackMap
+      BOAT -> Board.boatMap
     )
 
     // game loop

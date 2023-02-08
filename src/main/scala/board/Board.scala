@@ -297,7 +297,7 @@ object Board {
     185 -> List(128, 153)
   )
 
-  val blackMap: Map[Int, List[Int]] = Map(
+  val boatMap: Map[Int, List[Int]] = Map(
     194 -> List(157),
     157 -> List(194, 115),
     115 -> List(157, 108),
