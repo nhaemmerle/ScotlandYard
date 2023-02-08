@@ -207,6 +207,14 @@ object Board {
     194 -> List(192, 193, 195)
   )
 
+  val testTaxiMap: Map[Int, List[Int]] = Map(
+    1 -> List(2, 3, 4, 5),
+    2 -> List(1, 3, 4, 5),
+    3 -> List(2, 1, 4, 5),
+    4 -> List(2, 3, 1, 5),
+    5 -> List(2, 3, 4, 1)
+  )
+
   val busMap: Map[Int, List[Int]] = Map(
     1 -> List(58, 46),
     58 -> List(1, 46, 74, 77),
