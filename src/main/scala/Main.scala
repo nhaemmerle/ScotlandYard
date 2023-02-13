@@ -84,6 +84,8 @@ object Main {
     println(s"${currentPlayer.name}, your tickets are: ")
     println(currentPlayer.tickets)
 
+    //TODO: implement DOUBLE tickets!!!
+    //TODO: implement moving removed ticket to mrX!!!
     MoveHandler.move(currentPlayer, playerQueue, board)
 
     //eventually enqueue the current player again
