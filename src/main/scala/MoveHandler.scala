@@ -81,6 +81,7 @@ object MoveHandler {
     val correspondingTickets: List[TicketType] = possibleMoves.foldLeft(List[TicketType]())((x, tuple) => if tuple._2.contains(move) then tuple._1 :: x else x)
     var ticketChoice: TicketType = null
     if correspondingTickets.length > 1 then {
+      //TODO: let player enter number instead of string
       ticketChoice = TicketType.valueOf(InteractionHandler.handleStringInputWithRetry(
         "Choose ticket:",
         "Invalid input, try again.",
@@ -93,6 +94,16 @@ object MoveHandler {
     //alter player properties (i.e. move player and remove ticket)
     currentPlayer.location = move
     currentPlayer.tickets = currentPlayer.tickets + (ticketChoice -> (currentPlayer.tickets(ticketChoice) - 1))
+
+    //move ticket to mrX
+    currentPlayer match
+      case _: Detective =>
+        playerQueue.foreach(
+          player => player match
+            case x: MrX => x.tickets = x.tickets + (ticketChoice -> (x.tickets(ticketChoice) + 1))
+            case _ =>
+        )
+      case _ =>
   }
 
   private def getPossibleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
