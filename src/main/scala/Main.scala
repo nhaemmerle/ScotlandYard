@@ -11,6 +11,7 @@ import scala.util.control.Breaks.*
 object Main {
   def main(args: Array[String]): Unit = {
     // number of moves at which mrX has to show himself
+    //TODO: implement showing mrX and counting his moves
     val revealMrX = List(3, 8, 13, 18, 24)
     //prepare the players
     // 18 initial start positions in the board
@@ -75,7 +76,6 @@ object Main {
     println(s"${currentPlayer.name}, your tickets are: ")
     println(currentPlayer.tickets)
 
-    //TODO: implement DOUBLE tickets!!!
     //TODO: implement moving removed ticket to mrX!!!
     MoveHandler.move(currentPlayer, playerQueue)
 
