@@ -60,6 +60,11 @@ object MoveHandler {
       "Invalid destination, try again.",
       i => possibleMoves(ticketCombination).contains(i)
     )
+
+    //alter player properties (i.e. move player and remove tickets)
+    currentPlayer.location = destination
+    currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._1 -> (currentPlayer.tickets(ticketCombination._1) - 1))
+    currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._2 -> (currentPlayer.tickets(ticketCombination._2) - 1))
   }
 
   private def performSingleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
@@ -87,10 +92,7 @@ object MoveHandler {
 
     //alter player properties (i.e. move player and remove ticket)
     currentPlayer.location = move
-    val numTickets: Int = currentPlayer.tickets.get(ticketChoice) match
-      case Some(value) => value
-      case None => 0
-    currentPlayer.tickets = currentPlayer.tickets + (ticketChoice -> (numTickets - 1))
+    currentPlayer.tickets = currentPlayer.tickets + (ticketChoice -> (currentPlayer.tickets(ticketChoice) - 1))
   }
 
   private def getPossibleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
