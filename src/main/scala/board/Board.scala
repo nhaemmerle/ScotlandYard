@@ -1,9 +1,12 @@
 package board
 
+import MapType.*
+
 /**
  * This object represents the game board. It contains four adjacency lists, representing the four different means of transport.
  */
 object Board {
+  type Board = Map[MapType, Map[Int, List[Int]]]
   val taxiMap: Map[Int, List[Int]] = Map(
     0 -> List(),
     1 -> List(8, 9),
@@ -302,5 +305,12 @@ object Board {
     157 -> List(194, 115),
     115 -> List(157, 108),
     108 -> List(115)
+  )
+
+  val board: Board = Map(
+    TAXI -> taxiMap,
+    BUS -> busMap,
+    UNDERGROUND -> undergroundMap,
+    BOAT -> boatMap
   )
 }

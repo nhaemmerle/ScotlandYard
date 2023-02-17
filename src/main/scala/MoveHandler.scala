@@ -1,6 +1,5 @@
-import Main.Board
 import characters.{Detective, MrX, PlayerCharacter, TicketType}
-import board.MapType
+import board.{Board, MapType}
 import characters.TicketType.{BLACK, UNDERGROUND}
 
 import scala.collection.mutable
@@ -10,25 +9,25 @@ object MoveHandler {
   /**
    * Handles interaction with current player, moves the player and increases corresponding ticket
    */
-  def move(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter], board: Board): Unit = {
+  def move(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
     //double move
     val doubleMove: Boolean = currentPlayer match
       case x: MrX => x.doubleTickets > 0 && InteractionHandler.handleConfirmationOrDenial("Do you want to make a double move?")
       case _ => false
 
-    if doubleMove then performDoubleMove(currentPlayer, playerQueue, board) else performSingleMove(currentPlayer, playerQueue, board)
+    if doubleMove then performDoubleMove(currentPlayer, playerQueue) else performSingleMove(currentPlayer, playerQueue)
   }
 
   /**
    * Lets the player (mrX) make a double move which consumes two tickets.
    */
-  private def performDoubleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter], board: Board): Unit = {
-    val possibleMoves: Map[(TicketType, TicketType), List[Int]] = getPossibleDoubleMoves(currentPlayer, board)
+  private def performDoubleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
+    val possibleMoves: Map[(TicketType, TicketType), List[Int]] = getPossibleDoubleMoves(currentPlayer)
     var ticketCombination: (TicketType, TicketType) = null
     var destination: Int = -1
     if possibleMoves.isEmpty then {
       println("No double moves possible! Please perform single move.\n")
-      performSingleMove(currentPlayer, playerQueue, board)
+      performSingleMove(currentPlayer, playerQueue)
       return
     } else if possibleMoves.size == 1 then {
       //there is only one ticket combination, the player can choose the destination directly...
@@ -57,14 +56,14 @@ object MoveHandler {
 
     //get the destination
     destination = InteractionHandler.handleIntInputWithRetry(
-      s"The only possible ticket combination is: ${possibleMoves.head._1}. Which destination?",
+      s"The possible destinations are: ${possibleMoves(ticketCombination)}. Which destination?",
       "Invalid destination, try again.",
       i => possibleMoves(ticketCombination).contains(i)
     )
   }
 
-  private def performSingleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter], board: Board): Unit = {
-    val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer, playerQueue, board)
+  private def performSingleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
+    val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer, playerQueue)
     //let the player make a move
     val move: Int = InteractionHandler.handleIntInputWithRetry(
       s"${currentPlayer.name}, you are currently at location ${currentPlayer.location}." +
@@ -94,7 +93,7 @@ object MoveHandler {
     currentPlayer.tickets = currentPlayer.tickets + (ticketChoice -> (numTickets - 1))
   }
 
-  private def getPossibleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter], board: Board): Map[TicketType, List[Int]] = {
+  private def getPossibleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
     //get positions blocked by other detectives
     var blockedPositions: ListBuffer[Int] = ListBuffer[Int]()
     currentPlayer match
@@ -108,27 +107,27 @@ object MoveHandler {
         )
       case _ =>
 
-    getPossibleMovesStatic(currentPlayer.tickets, currentPlayer.location, board, blockedPositions)
+    getPossibleMovesStatic(currentPlayer.tickets, currentPlayer.location, blockedPositions)
   }
 
-  private def getPossibleMovesStatic(tickets: Map[TicketType, Int], location: Int, board: Board, blockedPositions: ListBuffer[Int]): Map[TicketType, List[Int]] = {
+  private def getPossibleMovesStatic(tickets: Map[TicketType, Int], location: Int, blockedPositions: ListBuffer[Int]): Map[TicketType, List[Int]] = {
     val availableTickets: Map[TicketType, Int] = tickets.filter(ticket => ticket._2 > 0)
-    availableTickets.map(ticket => (ticket._1, getPossibleMovesForTicketType(location, board, ticket._1, blockedPositions))).filter(tuple => tuple._2.nonEmpty)
+    availableTickets.map(ticket => (ticket._1, getPossibleMovesForTicketType(location, ticket._1, blockedPositions))).filter(tuple => tuple._2.nonEmpty)
   }
 
-  private def getPossibleMovesForTicketType(position: Int, board: Board, ticketType: TicketType, blockedFields: ListBuffer[Int]): List[Int] = {
+  private def getPossibleMovesForTicketType(position: Int, ticketType: TicketType, blockedFields: ListBuffer[Int]): List[Int] = {
     var possibleMoves: ListBuffer[Int] = ListBuffer()
     ticketType match
-      case TicketType.TAXI => possibleMoves = getPossibleMovesForMapType(position, board, MapType.TAXI, blockedFields)
-      case TicketType.BUS => possibleMoves = getPossibleMovesForMapType(position, board, MapType.BUS, blockedFields)
-      case TicketType.UNDERGROUND => possibleMoves = getPossibleMovesForMapType(position, board, MapType.UNDERGROUND, blockedFields)
-      case TicketType.BLACK => MapType.values.foreach(mapType => possibleMoves = possibleMoves ++ getPossibleMovesForMapType(position, board, mapType, blockedFields))
+      case TicketType.TAXI => possibleMoves = getPossibleMovesForMapType(position, MapType.TAXI, blockedFields)
+      case TicketType.BUS => possibleMoves = getPossibleMovesForMapType(position, MapType.BUS, blockedFields)
+      case TicketType.UNDERGROUND => possibleMoves = getPossibleMovesForMapType(position, MapType.UNDERGROUND, blockedFields)
+      case TicketType.BLACK => MapType.values.foreach(mapType => possibleMoves = possibleMoves ++ getPossibleMovesForMapType(position, mapType, blockedFields))
 
     possibleMoves.toList
   }
 
-  private def getPossibleMovesForMapType(position: Int, board: Board, mapType: MapType, blockedFields: ListBuffer[Int]): ListBuffer[Int] = {
-    board.get(mapType) match
+  private def getPossibleMovesForMapType(position: Int, mapType: MapType, blockedFields: ListBuffer[Int]): ListBuffer[Int] = {
+    Board.board.get(mapType) match
       case Some(m) => m.get(position) match
         case Some(l) => (ListBuffer.empty ++= l).filterNot(blockedFields.toSet)
         case None => ListBuffer()
@@ -138,18 +137,17 @@ object MoveHandler {
   /**
    * Gets the destinations the player can reach in two steps
    */
-  private def getPossibleDoubleMoves(currentPlayer: PlayerCharacter, board: Board): Map[(TicketType, TicketType), List[Int]] = {
+  private def getPossibleDoubleMoves(currentPlayer: PlayerCharacter): Map[(TicketType, TicketType), List[Int]] = {
     var possibleMoves: Map[(TicketType, TicketType), List[Int]] = Map()
 
     //first step
-    val possibleFirstSteps: Map[TicketType, List[Int]] = getPossibleMovesStatic(currentPlayer.tickets, currentPlayer.location, board, ListBuffer())
+    val possibleFirstSteps: Map[TicketType, List[Int]] = getPossibleMovesStatic(currentPlayer.tickets, currentPlayer.location, ListBuffer())
 
     //second step
     var possibleSecondSteps: Map[TicketType, List[(Int, Map[TicketType, List[Int]])]] =
       possibleFirstSteps.map((ticketType: TicketType, fields: List[Int]) => ticketType -> fields.map(field => (field, getPossibleMovesStatic(
         currentPlayer.tickets + (ticketType -> (currentPlayer.tickets(ticketType) - 1)),
         field,
-        board,
         ListBuffer()
       ))))
 

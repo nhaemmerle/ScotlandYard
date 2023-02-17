@@ -9,8 +9,6 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
-  type Board = Map[MapType, Map[Int, List[Int]]]
-
   def main(args: Array[String]): Unit = {
     // number of moves at which mrX has to show himself
     val revealMrX = List(3, 8, 13, 18, 24)
@@ -47,21 +45,13 @@ object Main {
     val playerQueue: mutable.Queue[PlayerCharacter] = mutable.Queue[PlayerCharacter](mrX)
     playerQueue.enqueueAll(detectives)
 
-    //init board
-    val board: Board = Map(
-      TAXI -> Board.taxiMap,
-      BUS -> Board.busMap,
-      UNDERGROUND -> Board.undergroundMap,
-      BOAT -> Board.boatMap
-    )
-
     // game loop
     //TODO: das mit numberOfMove hab ich nur auf die schnelle gemacht sodass es passt; kann man bestimmt schöner machen
     var round: Int = 1
     var numberOfMove: Int = 1
     breakable {
       while (true) {
-        performOneMove(playerQueue, board)
+        performOneMove(playerQueue)
         numberOfMove = (numberOfMove + 1) % (playerQueue.length + 1)
         round += numberOfMove / playerQueue.length
         if checkForWinCondition(round, mrX, detectives) then break
@@ -76,7 +66,7 @@ object Main {
     Detective(input, nextPosition)
   }
 
-  private def performOneMove(playerQueue: mutable.Queue[PlayerCharacter], board: Board): Unit = {
+  private def performOneMove(playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
     //dequeue to get the current player
     val currentPlayer: PlayerCharacter = playerQueue.dequeue()
 
@@ -87,7 +77,7 @@ object Main {
 
     //TODO: implement DOUBLE tickets!!!
     //TODO: implement moving removed ticket to mrX!!!
-    MoveHandler.move(currentPlayer, playerQueue, board)
+    MoveHandler.move(currentPlayer, playerQueue)
 
     //eventually enqueue the current player again
     playerQueue.enqueue(currentPlayer)
