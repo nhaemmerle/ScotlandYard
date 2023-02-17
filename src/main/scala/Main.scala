@@ -81,6 +81,7 @@ object Main {
     val currentPlayer: PlayerCharacter = playerQueue.dequeue()
 
     //print ticket state of player
+    println(s"\n\n+++++++++++ Current player: ${currentPlayer.name} +++++++++++\n\n")
     println(s"${currentPlayer.name}, your tickets are: ")
     println(currentPlayer.tickets)
 

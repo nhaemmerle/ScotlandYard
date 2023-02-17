@@ -28,4 +28,14 @@ object InteractionHandler {
     }
     input
   }
+
+  def handleConfirmationOrDenial(message: String): Boolean = {
+    val i: String = handleInputWithRetry[String](
+      message + "(y/n)",
+      "Invalid input, try again. (y/n)",
+      i => i.equals("y") || i.equals("n"),
+      handleStringInput
+    )
+    i.equals("y")
+  }
 }
