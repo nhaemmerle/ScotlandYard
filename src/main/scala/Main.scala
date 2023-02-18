@@ -9,10 +9,12 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
+  //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
+  var mrXMoves: Int = 0
+  // number of moves at which mrX has to show himself
+  private val revealMrXFields: List[Int] = List(3, 8, 13, 18, 24)
+
   def main(args: Array[String]): Unit = {
-    // number of moves at which mrX has to show himself
-    //TODO: implement showing mrX and counting his moves
-    val revealMrX = List(3, 8, 13, 18, 24)
     //prepare the players
     // 18 initial start positions in the board
     val startCards = ListBuffer(13, 26, 29, 34, 51, 53, 91, 94, 103, 112, 117, 132, 138, 141, 155, 174, 197, 198)
@@ -47,16 +49,8 @@ object Main {
     playerQueue.enqueueAll(detectives)
 
     // game loop
-    //TODO: das mit numberOfMove hab ich nur auf die schnelle gemacht sodass es passt; kann man bestimmt schöner machen
-    var round: Int = 1
-    var numberOfMove: Int = 1
-    breakable {
-      while (true) {
-        performOneMove(playerQueue)
-        numberOfMove = (numberOfMove + 1) % (playerQueue.length + 1)
-        round += numberOfMove / playerQueue.length
-        if checkForWinCondition(round, mrX, detectives) then break
-      }
+    while (!checkForWinCondition(mrX, detectives)) {
+      performOneMove(playerQueue)
     }
   }
 
@@ -78,17 +72,26 @@ object Main {
 
     MoveHandler.move(currentPlayer, playerQueue)
 
+    //reveal mrX
+    currentPlayer match
+      case x: MrX => if revealMrXFields.contains(mrXMoves) then revealMrX(x)
+      case _ =>
+
     //eventually enqueue the current player again
     playerQueue.enqueue(currentPlayer)
   }
 
-  private def checkForWinCondition(round: Int, mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {
+  private def revealMrX(mrX: MrX): Unit = {
+    println(s"MrX is at field: ${mrX.location}")
+  }
+
+  private def checkForWinCondition(mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {
     //FIXME: non local returns no longer supported (?)
     for (detective <- detectives) {
       if detective.location == mrX.location then {
         println("The detectives win")
         return true
-      } else if round >= 24 then {
+      } else if mrXMoves >= 24 then {
         println("Mr. X wins!")
         return true
       }

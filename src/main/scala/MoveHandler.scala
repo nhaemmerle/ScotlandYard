@@ -16,6 +16,10 @@ object MoveHandler {
       case _ => false
 
     if doubleMove then performDoubleMove(currentPlayer, playerQueue) else performSingleMove(currentPlayer, playerQueue)
+
+    currentPlayer match
+      case x: MrX => if doubleMove then Main.mrXMoves += 2 else Main.mrXMoves += 1
+      case _ =>
   }
 
   /**
