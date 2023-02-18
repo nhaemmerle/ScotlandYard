@@ -16,18 +16,15 @@ object MoveHandler {
       case _ => false
 
     if doubleMove then performDoubleMove(currentPlayer, playerQueue) else performSingleMove(currentPlayer, playerQueue)
-
-    currentPlayer match
-      case x: MrX => if doubleMove then Main.mrXMoves += 2 else Main.mrXMoves += 1
-      case _ =>
   }
 
   /**
    * Lets the player (mrX) make a double move which consumes two tickets.
    */
   private def performDoubleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
-    val possibleMoves: Map[(TicketType, TicketType), List[Int]] = getPossibleDoubleMoves(currentPlayer)
-    var ticketCombination: (TicketType, TicketType) = null
+    val possibleMoves: Map[(TicketType, TicketType, Int), List[Int]] = getPossibleDoubleMoves(currentPlayer, playerQueue)
+    //ticketCombination is a 3-tuple consisting of the first ticket, the second ticket, and the first step field
+    var ticketCombination: (TicketType, TicketType, Int) = null
     var destination: Int = -1
     if possibleMoves.isEmpty then {
       println("No double moves possible! Please perform single move.\n")
@@ -39,7 +36,7 @@ object MoveHandler {
       ticketCombination = possibleMoves.head._1
     } else {
       //number the ticket combinations to make player interaction a bit easier
-      var combinationNumbering: Map[Int, (TicketType, TicketType)] = Map()
+      var combinationNumbering: Map[Int, (TicketType, TicketType, Int)] = Map()
       var message: String = "The possible move combinations are:\n\n"
       var c: Int = 1
       //list the possible ticket combinations
@@ -65,14 +62,16 @@ object MoveHandler {
       i => possibleMoves(ticketCombination).contains(i)
     )
 
-    //alter player properties (i.e. move player and remove tickets)
+    //alter player properties (i.e. move player, remove tickets and add moves to Main.mrXMoves)
     currentPlayer.location = destination
     currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._1 -> (currentPlayer.tickets(ticketCombination._1) - 1))
     currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._2 -> (currentPlayer.tickets(ticketCombination._2) - 1))
+    Main.mrXMoves.append(ticketCombination._3)
+    Main.mrXMoves.append(destination)
   }
 
   private def performSingleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
-    val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer, playerQueue)
+    val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer.tickets, currentPlayer.location, playerQueue)
     //let the player make a move
     val move: Int = InteractionHandler.handleIntInputWithRetry(
       s"${currentPlayer.name}, you are currently at location ${currentPlayer.location}." +
@@ -99,7 +98,7 @@ object MoveHandler {
     currentPlayer.location = move
     currentPlayer.tickets = currentPlayer.tickets + (ticketChoice -> (currentPlayer.tickets(ticketChoice) - 1))
 
-    //move ticket to mrX
+    //move ticket to mrX and add mrX's move
     currentPlayer match
       case _: Detective =>
         playerQueue.foreach(
@@ -107,27 +106,20 @@ object MoveHandler {
             case x: MrX => x.tickets = x.tickets + (ticketChoice -> (x.tickets(ticketChoice) + 1))
             case _ =>
         )
-      case _ =>
+      case _: MrX => Main.mrXMoves.append(move)
   }
 
-  private def getPossibleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
+  private def getPossibleMoves(tickets: Map[TicketType, Int], location: Int, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
     //get positions blocked by other detectives
     var blockedPositions: ListBuffer[Int] = ListBuffer[Int]()
-    currentPlayer match
-      case _: Detective =>
-        playerQueue.foreach(
-          player => {
-            blockedPositions = blockedPositions ++ (player match
-              case d: Detective => ListBuffer(d.location)
-              case _ => ListBuffer())
-          }
-        )
-      case _ =>
+    playerQueue.foreach(
+      player => {
+        blockedPositions = blockedPositions ++ (player match
+          case d: Detective => ListBuffer(d.location)
+          case _ => ListBuffer())
+      }
+    )
 
-    getPossibleMovesStatic(currentPlayer.tickets, currentPlayer.location, blockedPositions)
-  }
-
-  private def getPossibleMovesStatic(tickets: Map[TicketType, Int], location: Int, blockedPositions: ListBuffer[Int]): Map[TicketType, List[Int]] = {
     val availableTickets: Map[TicketType, Int] = tickets.filter(ticket => ticket._2 > 0)
     availableTickets.map(ticket => (ticket._1, getPossibleMovesForTicketType(location, ticket._1, blockedPositions))).filter(tuple => tuple._2.nonEmpty)
   }
@@ -154,25 +146,25 @@ object MoveHandler {
   /**
    * Gets the destinations the player can reach in two steps
    */
-  private def getPossibleDoubleMoves(currentPlayer: PlayerCharacter): Map[(TicketType, TicketType), List[Int]] = {
-    var possibleMoves: Map[(TicketType, TicketType), List[Int]] = Map()
+  private def getPossibleDoubleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[(TicketType, TicketType, Int), List[Int]] = {
+    var possibleMoves: Map[(TicketType, TicketType, Int), List[Int]] = Map()
 
     //first step
-    val possibleFirstSteps: Map[TicketType, List[Int]] = getPossibleMovesStatic(currentPlayer.tickets, currentPlayer.location, ListBuffer())
+    val possibleFirstSteps: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer.tickets, currentPlayer.location, playerQueue)
 
     //second step
-    var possibleSecondSteps: Map[TicketType, List[(Int, Map[TicketType, List[Int]])]] =
-      possibleFirstSteps.map((ticketType: TicketType, fields: List[Int]) => ticketType -> fields.map(field => (field, getPossibleMovesStatic(
+    val possibleSecondSteps: Map[TicketType, List[(Int, Map[TicketType, List[Int]])]] =
+      possibleFirstSteps.map((ticketType: TicketType, fields: List[Int]) => ticketType -> fields.map(field => (field, getPossibleMoves(
         currentPlayer.tickets + (ticketType -> (currentPlayer.tickets(ticketType) - 1)),
         field,
-        ListBuffer()
+        playerQueue
       ))))
 
     //zip together
     possibleSecondSteps.foreach((firstStepTicketType, firstStepFields) => {
-      firstStepFields.foreach((_, secondSteps) => {
+      firstStepFields.foreach((firstStepField, secondSteps) => {
         secondSteps.foreach((secondStepTicketType, destinations) => {
-          possibleMoves = possibleMoves + ((firstStepTicketType, secondStepTicketType) -> destinations)
+          possibleMoves = possibleMoves + ((firstStepTicketType, secondStepTicketType, firstStepField) -> destinations)
         })
       })
     })
