@@ -26,12 +26,20 @@ object Main {
     //    val randomStartCards: ListBuffer[Int] = testStartCards
 
     printWelcomeMessage()
-    
+
     var mrX: MrX = null
     // Choose if you want MrX to be a KI
     if InteractionHandler.handleConfirmationOrDenial("Do you want MrX to be a computer Opponent ") then
-      //TODO computer Opponent mrX
-      mrX = MrXKI(KILevel.Random_Moves, randomStartCards.head)
+      InteractionHandler.handleIntInputWithRetry(
+        """
+          |Choose KI Level:
+          | 1) Basic
+          | 2) Still Basic but better
+          | 3) Ultra Hard 
+          |""".stripMargin, "Invalid choice try again", i => List(1,2).contains(i) ) match
+        case 1 => mrX = MrXKI(KILevel.Easy, randomStartCards.head)
+        case 2 => mrX = MrXKI(KILevel.Medium, randomStartCards.head)
+        case 3 => mrX = MrXKI(KILevel.Medium, randomStartCards.head)
     else
       //init mrX
       mrX = MrX(InteractionHandler.handleStringInput("Name of Player Mr.X:"), randomStartCards.head)

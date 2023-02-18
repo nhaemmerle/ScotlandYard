@@ -1,7 +1,6 @@
 package characters
 
-enum KILevel {  
-  case Random_Moves 
+enum KILevel {
   case Easy
   case Medium 
   case Hard

@@ -11,7 +11,7 @@ object InteractionHandler {
     readInt()
   }
 
-  def handleIntInputWithRetry(initialMessage: String, retryMessage: String, condition: Int => Boolean): Int = {
+  def handleIntInputWithRetry(initialMessage: String, retryMessage: String = "invalid input try again", condition: Int => Boolean): Int = {
     handleInputWithRetry[Int](initialMessage, retryMessage, condition, handleIntInput)
   }
 
