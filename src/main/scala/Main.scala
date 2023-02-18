@@ -1,4 +1,4 @@
-import board.MapType.{BLACK, BUS, TAXI, UNDERGROUND}
+import board.MapType.*
 import board.{Board, MapType}
 
 import scala.io.StdIn.readLine
@@ -9,16 +9,18 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
-  type Board = Map[MapType, Map[Int, List[Int]]]
-
   def main(args: Array[String]): Unit = {
+    // number of moves at which mrX has to show himself
+    //TODO: implement showing mrX and counting his moves
+    val revealMrX = List(3, 8, 13, 18, 24)
     //prepare the players
     // 18 initial start positions in the board
     val startCards = ListBuffer(13, 26, 29, 34, 51, 53, 91, 94, 103, 112, 117, 132, 138, 141, 155, 174, 197, 198)
     val testStartCards = ListBuffer(1, 2, 3, 4, 5)
     //randomStartCards represents a random shuffling of the 18 start cards
     //TODO: implement as queue/stack/...
-    val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(testStartCards)
+    val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
+    //    val randomStartCards: ListBuffer[Int] = testStartCards
 
     //init mrX
     val mrX = MrX(InteractionHandler.handleStringInput("Name of Player Mr.X:"), randomStartCards.head)
@@ -44,21 +46,13 @@ object Main {
     val playerQueue: mutable.Queue[PlayerCharacter] = mutable.Queue[PlayerCharacter](mrX)
     playerQueue.enqueueAll(detectives)
 
-    //init board
-    val board: Board = Map(
-      TAXI -> Board.testTaxiMap,
-      BUS -> Board.busMap,
-      UNDERGROUND -> Board.undergroundMap,
-      BLACK -> Board.blackMap
-    )
-
     // game loop
     //TODO: das mit numberOfMove hab ich nur auf die schnelle gemacht sodass es passt; kann man bestimmt schöner machen
     var round: Int = 1
     var numberOfMove: Int = 1
     breakable {
       while (true) {
-        performOneMove(playerQueue, board)
+        performOneMove(playerQueue)
         numberOfMove = (numberOfMove + 1) % (playerQueue.length + 1)
         round += numberOfMove / playerQueue.length
         if checkForWinCondition(round, mrX, detectives) then break
@@ -73,52 +67,19 @@ object Main {
     Detective(input, nextPosition)
   }
 
-  private def performOneMove(playerQueue: mutable.Queue[PlayerCharacter], board: Board): Unit = {
+  private def performOneMove(playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
     //dequeue to get the current player
     val currentPlayer: PlayerCharacter = playerQueue.dequeue()
-    var possibleMoves: Map[MapType, List[Int]] = getPossibleMoves(board, currentPlayer, playerQueue)
 
-    //let the player make a move
-    val move: Int = InteractionHandler.handleIntInputWithRetry(
-      s"${currentPlayer.name}, you are currently at location ${currentPlayer.location}." +
-        s" You can move to: ${possibleMoves.mkString(", ")}",
-      "Invalid move. Please try again.",
-      i => possibleMoves.get(TAXI) match
-        case Some(l) => l.contains(i)
-        case None => false
-    )
-    currentPlayer.location = move
-    //TODO: decrease corresponding number of tickets
+    //print ticket state of player
+    println(s"\n\n+++++++++++ Current player: ${currentPlayer.name} +++++++++++\n\n")
+    println(s"${currentPlayer.name}, your tickets are: ")
+    println(currentPlayer.tickets)
+
+    MoveHandler.move(currentPlayer, playerQueue)
 
     //eventually enqueue the current player again
     playerQueue.enqueue(currentPlayer)
-  }
-
-  private def getPossibleMoves(board: Board, currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[MapType, List[Int]] = {
-    //get the reachable fields for each means of transport
-    //TODO: filter possibleMoves with the following criteria
-    // - player needs to have a corresponding ticket
-
-    //get positions blocked by other detectives
-    var blockedPositions: ListBuffer[Int] = ListBuffer[Int]()
-    playerQueue.foreach(
-      player => {
-        blockedPositions = blockedPositions ++ (player match
-          case d: Detective => ListBuffer(d.location)
-          case _: MrX => ListBuffer())
-      }
-    )
-
-    var possibleMoves: Map[MapType, List[Int]] = Map[MapType, List[Int]]()
-    board.foreach(map => {
-      possibleMoves = possibleMoves + (
-        map._1 -> (map._2.get(currentPlayer.location) match
-          // remove blocked positions from possible moves
-          case Some(l) => l.filterNot(blockedPositions.toSet)
-          case None => List())
-        )
-    })
-    possibleMoves
   }
 
   private def checkForWinCondition(round: Int, mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {

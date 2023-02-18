@@ -12,12 +12,30 @@ object InteractionHandler {
   }
 
   def handleIntInputWithRetry(initialMessage: String, retryMessage: String, condition: Int => Boolean): Int = {
-    var input: Int = handleIntInput(initialMessage)
+    handleInputWithRetry[Int](initialMessage, retryMessage, condition, handleIntInput)
+  }
+
+  def handleStringInputWithRetry(initialMessage: String, retryMessage: String, condition: String => Boolean): String = {
+    handleInputWithRetry[String](initialMessage, retryMessage, condition, handleStringInput)
+  }
+
+  private def handleInputWithRetry[A](initialMessage: String, retryMessage: String, condition: A => Boolean, handleFunction: String => A): A = {
+    var input: A = handleFunction(initialMessage)
     var b: Boolean = condition(input)
     while (!b) {
-      input = handleIntInput(retryMessage)
+      input = handleFunction(retryMessage)
       b = condition(input)
     }
     input
+  }
+
+  def handleConfirmationOrDenial(message: String): Boolean = {
+    val i: String = handleInputWithRetry[String](
+      message + "(y/n)",
+      "Invalid input, try again. (y/n)",
+      i => i.equals("y") || i.equals("n"),
+      handleStringInput
+    )
+    i.equals("y")
   }
 }
