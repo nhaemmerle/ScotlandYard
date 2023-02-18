@@ -22,8 +22,8 @@ object Main {
     val testStartCards = ListBuffer(1, 2, 3, 4, 5)
     //randomStartCards represents a random shuffling of the 18 start cards
     //TODO: implement as queue/stack/...
-    val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
-    //    val randomStartCards: ListBuffer[Int] = testStartCards
+    //val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
+    val randomStartCards: ListBuffer[Int] = testStartCards
 
     printWelcomeMessage()
 
@@ -35,11 +35,11 @@ object Main {
           |Choose KI Level:
           | 1) Basic
           | 2) Still Basic but better
-          | 3) Ultra Hard 
-          |""".stripMargin, "Invalid choice try again", i => List(1,2).contains(i) ) match
+          | 3) Ultra Hard
+          |""".stripMargin, "Invalid choice try again", i => List(1,2,3).contains(i) ) match
         case 1 => mrX = MrXKI(KILevel.Easy, randomStartCards.head)
         case 2 => mrX = MrXKI(KILevel.Medium, randomStartCards.head)
-        case 3 => mrX = MrXKI(KILevel.Medium, randomStartCards.head)
+        case 3 => mrX = MrXKI(KILevel.Hard, randomStartCards.head)
     else
       //init mrX
       mrX = MrX(InteractionHandler.handleStringInput("Name of Player Mr.X:"), randomStartCards.head)

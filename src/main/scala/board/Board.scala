@@ -211,11 +211,11 @@ object Board {
   )
 
   val testTaxiMap: Map[Int, List[Int]] = Map(
-    1 -> List(2, 3, 4, 5),
-    2 -> List(1, 3, 4, 5),
-    3 -> List(2, 1, 4, 5),
+    1 -> List(2, 3, 4),
+    2 -> List(1, 3, 4),
+    3 -> List(2, 1, 4),
     4 -> List(2, 3, 1, 5),
-    5 -> List(2, 3, 4, 1)
+    5 -> List(2, 3, 4)
   )
 
   val busMap: Map[Int, List[Int]] = Map(
@@ -282,7 +282,7 @@ object Board {
     191 -> List(163, 165, 190),
     190 -> List(176, 180, 191)
   )
-
+  val testbusMap: Map[Int, List[Int]] = Map()
   val undergroundMap: Map[Int, List[Int]] = Map(
     1 -> List(46),
     46 -> List(1, 13, 74, 79),
@@ -299,7 +299,7 @@ object Board {
     163 -> List(111, 153),
     185 -> List(128, 153)
   )
-
+  val testUndergroundMap : Map[Int, List[Int]]= Map()
   val boatMap: Map[Int, List[Int]] = Map(
     194 -> List(157),
     157 -> List(194, 115),
@@ -308,9 +308,9 @@ object Board {
   )
 
   val board: Board = Map(
-    TAXI -> taxiMap,
-    BUS -> busMap,
-    UNDERGROUND -> undergroundMap,
+    TAXI -> testTaxiMap,
+    BUS -> testbusMap,
+    UNDERGROUND -> testUndergroundMap,
     BOAT -> boatMap
   )
 }

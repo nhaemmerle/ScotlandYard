@@ -150,7 +150,7 @@ object MoveHandler {
   /**
    * Gets the destinations the player can reach in two steps
    */
-  private def getPossibleDoubleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[(TicketType, TicketType, Int), List[Int]] = {
+  def getPossibleDoubleMoves(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Map[(TicketType, TicketType, Int), List[Int]] = {
     var possibleMoves: Map[(TicketType, TicketType, Int), List[Int]] = Map()
 
     //first step
