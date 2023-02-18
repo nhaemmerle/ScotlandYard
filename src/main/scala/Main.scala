@@ -9,10 +9,13 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
+  //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
+  var mrXMoves: ListBuffer[Int] = ListBuffer()
+  private var mrXLatestSeen: Int = -1
+  // number of moves at which mrX has to show himself
+  private val revealMrXFields: List[Int] = List(3, 8, 13, 18, 24)
+
   def main(args: Array[String]): Unit = {
-    // number of moves at which mrX has to show himself
-    //TODO: implement showing mrX and counting his moves
-    val revealMrX = List(3, 8, 13, 18, 24)
     //prepare the players
     // 18 initial start positions in the board
     val startCards = ListBuffer(13, 26, 29, 34, 51, 53, 91, 94, 103, 112, 117, 132, 138, 141, 155, 174, 197, 198)
@@ -47,16 +50,8 @@ object Main {
     playerQueue.enqueueAll(detectives)
 
     // game loop
-    //TODO: das mit numberOfMove hab ich nur auf die schnelle gemacht sodass es passt; kann man bestimmt schöner machen
-    var round: Int = 1
-    var numberOfMove: Int = 1
-    breakable {
-      while (true) {
-        performOneMove(playerQueue)
-        numberOfMove = (numberOfMove + 1) % (playerQueue.length + 1)
-        round += numberOfMove / playerQueue.length
-        if checkForWinCondition(round, mrX, detectives) then break
-      }
+    while (!checkForWinCondition(mrX, detectives)) {
+      performOneMove(playerQueue)
     }
   }
 
@@ -73,22 +68,34 @@ object Main {
 
     //print ticket state of player
     println(s"\n\n+++++++++++ Current player: ${currentPlayer.name} +++++++++++\n\n")
+    println(s"MrX latest seen at: $mrXLatestSeen")
     println(s"${currentPlayer.name}, your tickets are: ")
     println(currentPlayer.tickets)
 
     MoveHandler.move(currentPlayer, playerQueue)
 
+    //reveal mrX
+    relocateMrXLatestSeen(currentPlayer)
+
     //eventually enqueue the current player again
     playerQueue.enqueue(currentPlayer)
   }
 
-  private def checkForWinCondition(round: Int, mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {
+  private def relocateMrXLatestSeen(currentPlayer: PlayerCharacter): Unit = {
+    var latestSeen: Int = -1
+    revealMrXFields.foreach(field => {
+      if field <= mrXMoves.length then latestSeen = mrXMoves(field - 1)
+    })
+    mrXLatestSeen = latestSeen
+  }
+
+  private def checkForWinCondition(mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {
     //FIXME: non local returns no longer supported (?)
     for (detective <- detectives) {
       if detective.location == mrX.location then {
         println("The detectives win")
         return true
-      } else if round >= 24 then {
+      } else if mrXMoves.length >= 24 then {
         println("Mr. X wins!")
         return true
       }
