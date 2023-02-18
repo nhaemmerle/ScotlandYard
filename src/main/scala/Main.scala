@@ -25,8 +25,16 @@ object Main {
     val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
     //    val randomStartCards: ListBuffer[Int] = testStartCards
 
-    //init mrX
-    val mrX = MrX(InteractionHandler.handleStringInput("Name of Player Mr.X:"), randomStartCards.head)
+    printWelcomeMessage()
+    
+    var mrX: MrX = null
+    // Choose if you want MrX to be a KI
+    if InteractionHandler.handleConfirmationOrDenial("Do you want MrX to be a computer Opponent ") then
+      //TODO computer Opponent mrX
+      mrX = MrXKI(KILevel.Random_Moves, randomStartCards.head)
+    else
+      //init mrX
+      mrX = MrX(InteractionHandler.handleStringInput("Name of Player Mr.X:"), randomStartCards.head)
 
     //init detectives
     val detectives: ListBuffer[Detective] = new ListBuffer[Detective]()
@@ -54,7 +62,27 @@ object Main {
       performOneMove(playerQueue)
     }
   }
+  private def printWelcomeMessage(): Unit = {
+    //println("  _________             __  .__                     .___ _____.___.                .___")
+    //println(" /   _____/ ____  _____/  |_|  | _____    ____    __| _/ \\__  |   |____ _______  __| _/")
+    //println(" \\_____  \\_/ ___\\/  _ \\   __\\  | \\__  \\  /    \\  / __ |   /   |   \\__  \\\\_  __ \\/ __ | ")
+    //println(" /        \\  \\__(  <_> )  | |  |__/ __ \\|   |  \\/ /_/ |   \\____   |/ __ \\|  | \\/ /_/ | ")
+    //println("/_______  /\\___  >____/|__| |____(____  /___|  /\\____ |   / ______(____  /__|  \\____ | ")
+    //println("        \\/     \\/                     \\/     \\/      \\/   \\/           \\/           \\/ \n")
 
+    println("   _____           _   _                 _  __     __           _ ")
+    println("  / ____|         | | | |               | | \\ \\   / /          | |")
+    println(" | (___   ___ ___ | |_| | __ _ _ __   __| |  \\ \\_/ /_ _ _ __ __| |")
+    println("  \\___ \\ / __/ _ \\| __| |/ _` | '_ \\ / _` |   \\   / _` | '__/ _` |")
+    println("  ____) | (_| (_) | |_| | (_| | | | | (_| |    | | (_| | | | (_| |")
+    println(" |_____/ \\___\\___/ \\__|_|\\__,_|_| |_|\\__,_|    |_|\\__,_|_|  \\__,_|")
+
+    //println("  ___         _   _              _  __   __           _ ")
+    //println(" / __| __ ___| |_| |__ _ _ _  __| | \\ \\ / /_ _ _ _ __| |")
+    //println(" \\__ \\/ _/ _ \\  _| / _` | ' \\/ _` |  \\ V / _` | '_/ _` |")
+    //println(" |___/\\__\\___/\\__|_\\__,_|_||_\\__,_|   |_|\\__,_|_| \\__,_|")
+
+  }
   private def readDetective(numDetectives: Int, nextPosition: Int): Detective = {
     //TODO: maybe implement method in InteractionHandler for multiple inputs with break condition (to simplify detective creation)?
     val input: String = InteractionHandler.handleStringInput("Name of Detective " + (numDetectives + 1) + ": (Enter \"q\" to quit adding players)")

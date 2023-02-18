@@ -1,6 +1,7 @@
-import characters.{Detective, MrX, PlayerCharacter, TicketType}
+import characters.{Detective, MrX, PlayerCharacter, MrXKI, TicketType}
 import board.{Board, MapType}
 import characters.TicketType.{BLACK, UNDERGROUND}
+import KIMoveHandler.performKIMove
 
 import scala.collection.mutable
 import scala.collection.mutable.ListBuffer
@@ -11,11 +12,14 @@ object MoveHandler {
    */
   def move(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
     //double move
-    val doubleMove: Boolean = currentPlayer match
-      case x: MrX => x.doubleTickets > 0 && InteractionHandler.handleConfirmationOrDenial("Do you want to make a double move?")
-      case _ => false
-
-    if doubleMove then performDoubleMove(currentPlayer, playerQueue) else performSingleMove(currentPlayer, playerQueue)
+    currentPlayer match
+      case ki: MrXKI => performKIMove(ki , playerQueue)
+      case x: MrX =>
+        if
+          (x.doubleTickets > 0 && InteractionHandler.handleConfirmationOrDenial("Do you want to make a double move?"))
+        then
+          performDoubleMove(currentPlayer, playerQueue) else performSingleMove(currentPlayer, playerQueue)
+      case _ => performSingleMove(currentPlayer, playerQueue)
   }
 
   /**
@@ -109,7 +113,7 @@ object MoveHandler {
       case _: MrX => Main.mrXMoves.append(move)
   }
 
-  private def getPossibleMoves(tickets: Map[TicketType, Int], location: Int, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
+  def getPossibleMoves(tickets: Map[TicketType, Int], location: Int, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {
     //get positions blocked by other detectives
     var blockedPositions: ListBuffer[Int] = ListBuffer[Int]()
     playerQueue.foreach(
