@@ -59,14 +59,17 @@ object KIMoveHandler {
     )
     return possibleMovesDetectives.distinct
   }
+
+  private def updateMrX(ki: MrXKI, location: Int, ticketChoice: TicketType): Unit = {
+    //alter mrX properties (i.e. move player and remove ticket)
+    ki.location = location
+    ki.tickets = ki.tickets + (ticketChoice -> (ki.tickets(ticketChoice) - 1))
+    Main.mrXMoves.append(ki.location)
+    //TODO potentiell print wieder entfernen
+    println(s"KI Location: ${ki.location}")
+    println(s"KI last Ticket: ${ticketChoice}")
+  }
+
 }
 
-private def updateMrX(ki: MrXKI, location: Int, ticketChoice: TicketType): Unit = {
-  //alter mrX properties (i.e. move player and remove ticket)
-  ki.location = location
-  ki.tickets = ki.tickets + (ticketChoice -> (ki.tickets(ticketChoice) - 1))
-  Main.mrXMoves.append(ki.location)
-  //TODO potentiell print wieder entfernen
-  println(s"KI Location: ${ki.location}")
-  println(s"KI last Ticket: ${ticketChoice}")
-}
+
