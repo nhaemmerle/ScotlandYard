@@ -9,6 +9,9 @@ class MrXKI(val level: KILevel, currentLocation: Int) extends MrX("KI", currentL
     BUS -> 3,
     UNDERGROUND -> 3
   )
+  def isLevel(level: KILevel): Boolean = {
+    level == this.level
+  }
 }
 
 
