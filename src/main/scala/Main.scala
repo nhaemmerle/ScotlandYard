@@ -9,6 +9,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
+  private val coloredOutput: Boolean = System.getProperty("os.name").toLowerCase().startsWith("windows")
   val testEnvironment: Boolean = false
   //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
   var mrXMoves: ListBuffer[(TicketType, Int)] = ListBuffer()
@@ -95,7 +96,8 @@ object Main {
 
     //print ticket state of player but suppress output for KI
     if !currentPlayer.isInstanceOf[MrXKI] then {
-      println(s"\n\n${Console.GREEN}+++++++++++ Current player: ${currentPlayer.name} +++++++++++${Console.RESET}")
+      if coloredOutput then println(s"\n\n${Console.GREEN}+++++++++++ Current player: ${currentPlayer.name} +++++++++++${Console.RESET}")
+      else println(s"\n\n+++++++++++ Current player: ${currentPlayer.name} +++++++++++")
       if mrXLatestSeen != -1 then println(s"MrX latest seen at: $mrXLatestSeen")
       println(s"Tickets used by MrX since start:\n${mrXMoves.map((ticketType, Int) => ticketType).mkString(" -> ")}")
       println("")
@@ -122,10 +124,12 @@ object Main {
   private def checkForWinCondition(mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {
     for (detective <- detectives) {
       if detective.location == mrX.location then {
-        println(s"${Console.GREEN}The detectives win${Console.RESET}")
+        var message: String = "The detectives win!"
+        println(if coloredOutput then s"${Console.RED}$message${Console.RESET}" else message)
         return true
       } else if mrXMoves.length >= 24 then {
-        println(s"${Console.RED}Mr.X escaped!${Console.RESET}")
+        var message: String = "Mr.X escaped!"
+        println(if coloredOutput then s"${Console.RED}$message${Console.RESET}" else message)
         return true
       }
     }
