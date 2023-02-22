@@ -27,7 +27,6 @@ object KIMoveHandler {
       .map((ticketType, destinations: List[Int]) => (ticketType, destinations.filterNot(possibleMovesDetective.toSet)))
       .filter((_, xs: List[Int]) => xs.nonEmpty)
 
-    //TODO if else mit match und wieder einzelnen funktionen ersetzen?
     if ki.isLevel(Medium) || ki.isLevel(Hard) then
       if filteredPossibleMoves.nonEmpty then
         // move to position that cant be reached by detectives
@@ -57,7 +56,7 @@ object KIMoveHandler {
       }
 
     )
-    return possibleMovesDetectives.distinct
+    possibleMovesDetectives.distinct
   }
 
   private def updateMrX(ki: MrXKI, location: Int, ticketChoice: TicketType): Unit = {

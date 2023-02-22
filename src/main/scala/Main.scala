@@ -21,7 +21,6 @@ object Main {
     // 18 initial start positions in the board
     val startCards = ListBuffer(13, 26, 29, 34, 51, 53, 91, 94, 103, 112, 117, 132, 138, 141, 155, 174, 197, 198)
     //randomStartCards represents a random shuffling of the 18 start cards
-    //TODO: implement as queue/stack/...
     val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
 
     //****test environment****
@@ -55,7 +54,6 @@ object Main {
         val nextPosition: Int = randomStartCards(detectives.length + 1)
         val newDetective: Detective = readDetective(detectives.length, nextPosition)
         if newDetective == null then
-        //TODO: spawn 4 detectives if only 3 players (or at least raise warning)
           if detectives.length < 2 then
             println("More detectives needed!")
           else break
@@ -86,7 +84,6 @@ object Main {
 
   }
   private def readDetective(numDetectives: Int, nextPosition: Int): Detective = {
-    //TODO: maybe implement method in InteractionHandler for multiple inputs with break condition (to simplify detective creation)?
     val input: String = InteractionHandler.handleStringInput("Name of Detective " + (numDetectives + 1) + ": (Enter \"q\" to quit adding players)")
     if input.equals("q") then return null
     Detective(input, nextPosition)
@@ -123,7 +120,6 @@ object Main {
   }
 
   private def checkForWinCondition(mrX: MrX, detectives: ListBuffer[Detective]): Boolean = {
-    //FIXME: non local returns no longer supported (?)
     for (detective <- detectives) {
       if detective.location == mrX.location then {
         println(s"${Console.GREEN}The detectives win${Console.RESET}")
