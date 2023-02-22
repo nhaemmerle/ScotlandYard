@@ -64,7 +64,7 @@ object KIMoveHandler {
     //alter mrX properties (i.e. move player and remove ticket)
     ki.location = location
     ki.tickets = ki.tickets + (ticketChoice -> (ki.tickets(ticketChoice) - 1))
-    Main.mrXMoves.append(ki.location)
+    Main.mrXMoves.append((ticketChoice, location))
     //TODO potentiell print wieder entfernen
     println(s"KI Location: ${ki.location}")
     println(s"KI last Ticket: ${ticketChoice}")

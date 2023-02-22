@@ -70,8 +70,8 @@ object MoveHandler {
     currentPlayer.location = destination
     currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._1 -> (currentPlayer.tickets(ticketCombination._1) - 1))
     currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._2 -> (currentPlayer.tickets(ticketCombination._2) - 1))
-    Main.mrXMoves.append(ticketCombination._3)
-    Main.mrXMoves.append(destination)
+    Main.mrXMoves.append((ticketCombination._1, ticketCombination._3))
+    Main.mrXMoves.append((ticketCombination._2, destination))
   }
 
   private def performSingleMove(currentPlayer: PlayerCharacter, playerQueue: mutable.Queue[PlayerCharacter]): Unit = {
@@ -110,7 +110,7 @@ object MoveHandler {
             case x: MrX => x.tickets = x.tickets + (ticketChoice -> (x.tickets(ticketChoice) + 1))
             case _ =>
         )
-      case _: MrX => Main.mrXMoves.append(move)
+      case _: MrX => Main.mrXMoves.append((ticketChoice, move))
   }
 
   def getPossibleMoves(tickets: Map[TicketType, Int], location: Int, playerQueue: mutable.Queue[PlayerCharacter]): Map[TicketType, List[Int]] = {

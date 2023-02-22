@@ -10,7 +10,7 @@ import scala.util.control.Breaks.*
 
 object Main {
   //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
-  var mrXMoves: ListBuffer[Int] = ListBuffer()
+  var mrXMoves: ListBuffer[(TicketType, Int)] = ListBuffer()
   private var mrXLatestSeen: Int = -1
   // number of moves at which mrX has to show himself
   private val revealMrXFields: List[Int] = List(3, 8, 13, 18, 24)
@@ -71,26 +71,6 @@ object Main {
     }
   }
   private def printWelcomeMessage(): Unit = {
-    /*
-    println("  _________             __  .__                     .___ _____.___.                .___")
-    println(" /   _____/ ____  _____/  |_|  | _____    ____    __| _/ \\__  |   |____ _______  __| _/")
-    println(" \\_____  \\_/ ___\\/  _ \\   __\\  | \\__  \\  /    \\  / __ |   /   |   \\__  \\\\_  __ \\/ __ | ")
-    println(" /        \\  \\__(  <_> )  | |  |__/ __ \\|   |  \\/ /_/ |   \\____   |/ __ \\|  | \\/ /_/ | ")
-    println("/_______  /\\___  >____/|__| |____(____  /___|  /\\____ |   / ______(____  /__|  \\____ | ")
-    println("        \\/     \\/                     \\/     \\/      \\/   \\/           \\/           \\/ \n")
-
-    println("   _____           _   _                 _  __     __           _ ")
-    println("  / ____|         | | | |               | | \\ \\   / /          | |")
-    println(" | (___   ___ ___ | |_| | __ _ _ __   __| |  \\ \\_/ /_ _ _ __ __| |")
-    println("  \\___ \\ / __/ _ \\| __| |/ _` | '_ \\ / _` |   \\   / _` | '__/ _` |")
-    println("  ____) | (_| (_) | |_| | (_| | | | | (_| |    | | (_| | | | (_| |")
-    println(" |_____/ \\___\\___/ \\__|_|\\__,_|_| |_|\\__,_|    |_|\\__,_|_|  \\__,_|")
-
-    println("  ___         _   _              _  __   __           _ ")
-    println(" / __| __ ___| |_| |__ _ _ _  __| | \\ \\ / /_ _ _ _ __| |")
-    println(" \\__ \\/ _/ _ \\  _| / _` | ' \\/ _` |  \\ V / _` | '_/ _` |")
-    println(" |___/\\__\\___/\\__|_\\__,_|_||_\\__,_|   |_|\\__,_|_| \\__,_|")
-    */
     print("""
       |███████╗ ██████╗ ██████╗ ████████╗██╗      █████╗ ███╗   ██╗██████╗        ██╗   ██╗ █████╗ ██████╗ ██████╗
       |██╔════╝██╔════╝██╔═══██╗╚══██╔══╝██║     ██╔══██╗████╗  ██║██╔══██╗       ╚██╗ ██╔╝██╔══██╗██╔══██╗██╔══██╗
@@ -116,22 +96,23 @@ object Main {
     //print ticket state of player
     println(s"\n\n+++++++++++ Current player: ${currentPlayer.name} +++++++++++\n\n")
     println(s"MrX latest seen at: $mrXLatestSeen")
+    println(s"Moves of MrX since latest reveal: ${mrXMoves.map((ticketType, Int) => ticketType)}")
     println(s"${currentPlayer.name}, your tickets are: ")
     println(currentPlayer.tickets)
 
     MoveHandler.move(currentPlayer, playerQueue)
 
     //reveal mrX
-    relocateMrXLatestSeen(currentPlayer)
+    relocateMrXLatestSeen()
 
     //eventually enqueue the current player again
     playerQueue.enqueue(currentPlayer)
   }
 
-  private def relocateMrXLatestSeen(currentPlayer: PlayerCharacter): Unit = {
+  private def relocateMrXLatestSeen(): Unit = {
     var latestSeen: Int = -1
     revealMrXFields.foreach(field => {
-      if field <= mrXMoves.length then latestSeen = mrXMoves(field - 1)
+      if field <= mrXMoves.length then latestSeen = mrXMoves((field - 1))._2
     })
     mrXLatestSeen = latestSeen
   }
