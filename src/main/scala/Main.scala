@@ -9,7 +9,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
-  private val coloredOutput: Boolean = System.getProperty("os.name").toLowerCase().startsWith("windows")
+  val coloredOutput: Boolean = !System.getProperty("os.name").toLowerCase().startsWith("windows")
   val testEnvironment: Boolean = false
   //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
   var mrXMoves: ListBuffer[(TicketType, Int)] = ListBuffer()
@@ -116,7 +116,7 @@ object Main {
   private def relocateMrXLatestSeen(): Unit = {
     var latestSeen: Int = -1
     revealMrXFields.foreach(field => {
-      if field <= mrXMoves.length then latestSeen = mrXMoves((field - 1))._2
+      if field <= mrXMoves.length then latestSeen = mrXMoves(field - 1)._2
     })
     mrXLatestSeen = latestSeen
   }

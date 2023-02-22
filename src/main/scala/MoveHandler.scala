@@ -16,7 +16,7 @@ object MoveHandler {
       case ki: MrXKI => performKIMove(ki , playerQueue)
       case x: MrX =>
         if
-          (x.doubleTickets > 0 && InteractionHandler.handleConfirmationOrDenial("Do you want to make a double move?"))
+          x.doubleTickets > 0 && InteractionHandler.handleConfirmationOrDenial("Do you want to make a double move?")
         then
           performDoubleMove(currentPlayer, playerQueue) else performSingleMove(currentPlayer, playerQueue)
       case _ => performSingleMove(currentPlayer, playerQueue)
@@ -78,7 +78,7 @@ object MoveHandler {
     val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer.tickets, currentPlayer.location, playerQueue)
     //let the player make a move
     val move: Int = InteractionHandler.handleIntInputWithRetry(
-      s"You are currently at location ${Console.GREEN}${currentPlayer.location}${Console.RESET}" +
+      s"You are currently at location ${if Main.coloredOutput then Console.GREEN else ""}${currentPlayer.location}${Console.RESET}" +
         s"\nYou can move to:\n- ${possibleMoves.mkString("\n- ")}\nPlease choose destination",
       "Invalid move. Please try again.",
       i => possibleMoves.foldLeft(false)((x, tuple) => x || tuple._2.contains(i))
