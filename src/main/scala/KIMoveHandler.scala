@@ -65,9 +65,6 @@ object KIMoveHandler {
     ki.location = location
     ki.tickets = ki.tickets + (ticketChoice -> (ki.tickets(ticketChoice) - 1))
     Main.mrXMoves.append((ticketChoice, location))
-    //TODO potentiell print wieder entfernen
-    println(s"KI Location: ${ki.location}")
-    println(s"KI last Ticket: ${ticketChoice}")
   }
 
 }

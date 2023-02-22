@@ -7,7 +7,7 @@ import MapType.*
  */
 object Board {
   type Board = Map[MapType, Map[Int, List[Int]]]
-  val taxiMap: Map[Int, List[Int]] = Map(
+  private val taxiMap: Map[Int, List[Int]] = Map(
     0 -> List(),
     1 -> List(8, 9),
     8 -> List(1, 18, 19),
@@ -209,16 +209,7 @@ object Board {
     192 -> List(190, 191, 194),
     194 -> List(192, 193, 195)
   )
-
-  val testTaxiMap: Map[Int, List[Int]] = Map(
-    1 -> List(2, 3, 4),
-    2 -> List(1, 3, 4),
-    3 -> List(2, 1, 4),
-    4 -> List(2, 3, 1, 5),
-    5 -> List(2, 3, 4)
-  )
-
-  val busMap: Map[Int, List[Int]] = Map(
+  private val busMap: Map[Int, List[Int]] = Map(
     1 -> List(58, 46),
     58 -> List(1, 46, 74, 77),
     46 -> List(1, 34, 58, 78),
@@ -282,8 +273,7 @@ object Board {
     191 -> List(163, 165, 190),
     190 -> List(176, 180, 191)
   )
-  val testbusMap: Map[Int, List[Int]] = Map()
-  val undergroundMap: Map[Int, List[Int]] = Map(
+  private val undergroundMap: Map[Int, List[Int]] = Map(
     1 -> List(46),
     46 -> List(1, 13, 74, 79),
     13 -> List(46, 67, 89),
@@ -299,18 +289,30 @@ object Board {
     163 -> List(111, 153),
     185 -> List(128, 153)
   )
-  val testUndergroundMap : Map[Int, List[Int]]= Map()
-  val boatMap: Map[Int, List[Int]] = Map(
+  private val boatMap: Map[Int, List[Int]] = Map(
     194 -> List(157),
     157 -> List(194, 115),
     115 -> List(157, 108),
     108 -> List(115)
   )
 
+  //****test environment****
+  private val testTaxiMap: Map[Int, List[Int]] = Map(
+    1 -> List(2, 3, 4),
+    2 -> List(1, 3, 4),
+    3 -> List(2, 1, 4),
+    4 -> List(2, 3, 1, 5),
+    5 -> List(2, 3, 4)
+  )
+  private val testbusMap: Map[Int, List[Int]] = Map()
+  private val testUndergroundMap: Map[Int, List[Int]] = Map()
+  //****test environment****
+
+
   val board: Board = Map(
-    TAXI -> testTaxiMap,
-    BUS -> testbusMap,
-    UNDERGROUND -> testUndergroundMap,
+    TAXI -> taxiMap,
+    BUS -> busMap,
+    UNDERGROUND -> undergroundMap,
     BOAT -> boatMap
   )
 }

@@ -9,6 +9,7 @@ import scala.collection.mutable.ListBuffer
 import scala.util.control.Breaks.*
 
 object Main {
+  val testEnvironment: Boolean = false
   //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
   var mrXMoves: ListBuffer[(TicketType, Int)] = ListBuffer()
   private var mrXLatestSeen: Int = -1
@@ -19,11 +20,13 @@ object Main {
     //prepare the players
     // 18 initial start positions in the board
     val startCards = ListBuffer(13, 26, 29, 34, 51, 53, 91, 94, 103, 112, 117, 132, 138, 141, 155, 174, 197, 198)
-    val testStartCards = ListBuffer(1, 2, 3, 4, 5)
     //randomStartCards represents a random shuffling of the 18 start cards
     //TODO: implement as queue/stack/...
-    //val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
-    val randomStartCards: ListBuffer[Int] = testStartCards
+    val randomStartCards: ListBuffer[Int] = scala.util.Random.shuffle(startCards)
+
+    //****test environment****
+//    val randomStartCards: ListBuffer[Int] = ListBuffer(1, 2, 3, 4, 5)
+    //****test environment****
 
     printWelcomeMessage()
 
@@ -93,12 +96,14 @@ object Main {
     //dequeue to get the current player
     val currentPlayer: PlayerCharacter = playerQueue.dequeue()
 
-    //print ticket state of player
-    println(s"\n\n+++++++++++ Current player: ${currentPlayer.name} +++++++++++\n\n")
-    println(s"MrX latest seen at: $mrXLatestSeen")
-    println(s"Moves of MrX since latest reveal: ${mrXMoves.map((ticketType, Int) => ticketType)}")
-    println(s"${currentPlayer.name}, your tickets are: ")
-    println(currentPlayer.tickets)
+    //print ticket state of player but suppress output for KI
+    if !currentPlayer.isInstanceOf[MrXKI] then {
+      println(s"\n\n${Console.GREEN}+++++++++++ Current player: ${currentPlayer.name} +++++++++++${Console.RESET}")
+      if mrXLatestSeen != -1 then println(s"MrX latest seen at: $mrXLatestSeen")
+      println(s"Tickets used by MrX since start:\n${mrXMoves.map((ticketType, Int) => ticketType).mkString(" -> ")}")
+      println("")
+      println(s"Your available tickets are:\n- ${currentPlayer.tickets.mkString("\n- ")}")
+    }
 
     MoveHandler.move(currentPlayer, playerQueue)
 
@@ -121,10 +126,10 @@ object Main {
     //FIXME: non local returns no longer supported (?)
     for (detective <- detectives) {
       if detective.location == mrX.location then {
-        println("The detectives win")
+        println(s"${Console.GREEN}The detectives win${Console.RESET}")
         return true
       } else if mrXMoves.length >= 24 then {
-        println("Mr. X wins!")
+        println(s"${Console.RED}Mr.X escaped!${Console.RESET}")
         return true
       }
     }

@@ -78,8 +78,8 @@ object MoveHandler {
     val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer.tickets, currentPlayer.location, playerQueue)
     //let the player make a move
     val move: Int = InteractionHandler.handleIntInputWithRetry(
-      s"${currentPlayer.name}, you are currently at location ${currentPlayer.location}." +
-        s" You can move to: ${possibleMoves.mkString(", ")}",
+      s"You are currently at location ${Console.GREEN}${currentPlayer.location}${Console.RESET}" +
+        s"\nYou can move to:\n- ${possibleMoves.mkString("\n- ")}\nPlease choose destination",
       "Invalid move. Please try again.",
       i => possibleMoves.foldLeft(false)((x, tuple) => x || tuple._2.contains(i))
     )
@@ -88,7 +88,7 @@ object MoveHandler {
     val correspondingTickets: List[TicketType] = possibleMoves.foldLeft(List[TicketType]())((x, tuple) => if tuple._2.contains(move) then tuple._1 :: x else x)
     var ticketChoice: TicketType = null
     if correspondingTickets.length > 1 then {
-      //TODO: let player enter number instead of string
+      //TODO: maybe let player enter number instead of string?
       ticketChoice = TicketType.valueOf(InteractionHandler.handleStringInputWithRetry(
         "Choose ticket:",
         "Invalid input, try again.",
