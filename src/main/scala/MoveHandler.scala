@@ -70,6 +70,8 @@ object MoveHandler {
     currentPlayer.location = destination
     currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._1 -> (currentPlayer.tickets(ticketCombination._1) - 1))
     currentPlayer.tickets = currentPlayer.tickets + (ticketCombination._2 -> (currentPlayer.tickets(ticketCombination._2) - 1))
+    currentPlayer match
+      case x: MrX => x.doubleTickets = x.doubleTickets - 1
     Main.mrXMoves.append((ticketCombination._1, ticketCombination._3))
     Main.mrXMoves.append((ticketCombination._2, destination))
   }
@@ -78,8 +80,7 @@ object MoveHandler {
     val possibleMoves: Map[TicketType, List[Int]] = getPossibleMoves(currentPlayer.tickets, currentPlayer.location, playerQueue)
     //let the player make a move
     val move: Int = InteractionHandler.handleIntInputWithRetry(
-      s"You are currently at location ${if Main.coloredOutput then Console.GREEN else ""}${currentPlayer.location}${Console.RESET}" +
-        s"\nYou can move to:\n- ${possibleMoves.mkString("\n- ")}\nPlease choose destination",
+        s"You can move to:\n- ${possibleMoves.mkString("\n- ")}\nPlease choose destination",
       "Invalid move. Please try again.",
       i => possibleMoves.foldLeft(false)((x, tuple) => x || tuple._2.contains(i))
     )

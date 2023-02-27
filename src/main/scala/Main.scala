@@ -10,7 +10,6 @@ import scala.util.control.Breaks.*
 
 object Main {
   val coloredOutput: Boolean = !System.getProperty("os.name").toLowerCase().startsWith("windows")
-  val testEnvironment: Boolean = false
   //stores how many moves mrX has done (to check win condition and if mrX has to reveal himself)
   var mrXMoves: ListBuffer[(TicketType, Int)] = ListBuffer()
   private var mrXLatestSeen: Int = -1
@@ -102,6 +101,7 @@ object Main {
       println(s"Tickets used by MrX since start:\n${mrXMoves.map((ticketType, Int) => ticketType).mkString(" -> ")}")
       println("")
       println(s"Your available tickets are:\n- ${currentPlayer.tickets.mkString("\n- ")}")
+      println(s"You are currently at location ${if Main.coloredOutput then Console.GREEN else ""}${currentPlayer.location}${Console.RESET}")
     }
 
     MoveHandler.move(currentPlayer, playerQueue)

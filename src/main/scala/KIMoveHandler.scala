@@ -32,7 +32,6 @@ object KIMoveHandler {
         // move to position that cant be reached by detectives
         move = filteredPossibleMoves.maxBy(_ => Random.nextInt)
         ticketChoice = move._1
-        return
       else if ki.isLevel(Hard) && filteredPossibleDoubleMoves.nonEmpty then
         val doubleMove = filteredPossibleDoubleMoves.maxBy(_ => Random.nextInt)
         val ticketTriple = doubleMove._1
